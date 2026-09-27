@@ -30,6 +30,7 @@ older macOS versions longer than Chrome or Safari do — and use that instead.
 | `04_md_stability_summary.ipynb` | Lightweight conformational-rigidity proxy for your top hits (see note below) | Google Colab |
 | `app.py` | Streamlit app: **Screening**, **Docking**, and **MD summary** tabs sharing one results table | Streamlit Community Cloud |
 | `requirements.txt` | Exact package versions for the app | Streamlit Community Cloud |
+| `packages.txt` | System-level apt packages (SWIG, Boost, build tools) — a fallback so `vina` still installs even if pip can't find a matching prebuilt wheel | Streamlit Community Cloud |
 
 ## How the three tabs fit together
 
@@ -96,6 +97,7 @@ both notebooks — nothing else needs to change.
    - `model.pkl`
    - `feature_names.json`
    - `receptor.pdbqt` and `box_config.json` (from step 3, if you did it — otherwise users can upload their own in the Docking tab each session)
+   - `packages.txt`
 3. Commit.
 
 ### 5. Deploy on Streamlit
@@ -108,7 +110,15 @@ both notebooks — nothing else needs to change.
 which is what Streamlit Community Cloud runs on — so this installs fine
 server-side regardless of your Mac's OS version. You never install it
 locally; it's only listed in `requirements.txt` for Streamlit's servers to
-install.
+install. `packages.txt` is a safety net: if pip can't find a matching wheel
+for the exact Python version Streamlit is running, it falls back to
+compiling `vina` from source, which needs the system packages listed there
+(SWIG, Boost, a compiler).
+
+### If deployment still fails on dependencies
+The Streamlit Cloud log usually names the exact package a few lines above
+the "non-zero exit code" line — scroll up in the log (or check "Manage app"
+→ logs) to confirm which one it is before changing anything further.
 
 ## Scaling this up later
 
